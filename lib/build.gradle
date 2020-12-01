@@ -1,12 +1,18 @@
 buildscript {
     ext.opentracing_version = "0.33.0"
     ext.exposed_version = "0.28.1"
+
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.9.2'
+    }
 }
 
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.20'
     id 'java-library'
 }
+
+apply plugin: 'com.novoda.bintray-release'
 
 repositories {
     jcenter()
@@ -40,4 +46,14 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+publish {
+    userOrg = 'fstien'
+    repoName = 'exposed-openTracing'
+    groupId = 'com.github.fstien'
+    artifactId = 'exposed-opentracing'
+    publishVersion = '0.1.0'
+    desc = 'OpenTracing instrumentation of Exposed.'
+    website = 'https://github.com/fstien/Exposed-OpenTracing'
 }
