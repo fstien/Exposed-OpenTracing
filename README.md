@@ -52,3 +52,7 @@ Add the following dependency to your `pom.xml`:
 Add the following to your dependencies in your `build.gradle`:
 
     implementation 'com.github.fstien:exposed-opentracing:VERSION_NUMBER'
+
+## Example 
+
+For an example Ktor application, see [Exposed-OpenTracing-example](https://github.com/fstien/Exposed-OpenTracing-example).
