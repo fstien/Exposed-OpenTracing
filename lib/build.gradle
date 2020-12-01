@@ -50,7 +50,7 @@ test {
 
 publish {
     userOrg = 'fstien'
-    repoName = 'exposed-openTracing'
+    repoName = 'exposed-opentracing'
     groupId = 'com.github.fstien'
     artifactId = 'exposed-opentracing'
     publishVersion = '0.1.0'
