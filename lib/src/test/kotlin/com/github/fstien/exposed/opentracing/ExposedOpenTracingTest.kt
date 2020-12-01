@@ -48,28 +48,28 @@ class ExposedOpenTracingTest: DatabaseTestsBase() {
 
     @Test
     fun `validInputs returns false if empty list and PII passed`() {
-        val result = validInputs(replacePii = emptyList(), contains = Contains.PII)
+        val result = validInputs(contains = Contains.PII, replacePii = emptyList())
 
         assertThat(result).isFalse()
     }
 
     @Test
     fun `validInputs returns false if non empty list and NoPII passed`() {
-        val result = validInputs(replacePii = listOf("password"), contains = Contains.NoPII)
+        val result = validInputs(contains = Contains.NoPII, replacePii = listOf("password"))
 
         assertThat(result).isFalse()
     }
 
     @Test
     fun `validInputs returns true for non empty list and PII passed`() {
-        val result = validInputs(replacePii = listOf("password"), contains = Contains.PII)
+        val result = validInputs(contains = Contains.PII, replacePii = listOf("password"))
 
         assertThat(result).isTrue()
     }
 
     @Test
     fun `validInputs returns true for empty list and NoPII passed`() {
-        val result = validInputs(replacePii = emptyList(), contains = Contains.NoPII)
+        val result = validInputs(contains = Contains.NoPII, replacePii = emptyList())
 
         assertThat(result).isTrue()
     }
@@ -121,7 +121,7 @@ class ExposedOpenTracingTest: DatabaseTestsBase() {
 
         runBlocking {
             withParentSpan {
-                tracedTransaction(username, password, contains = PII) {
+                tracedTransaction(contains = PII, username, password) {
                     Person.insert {
                         it[Person.username] = username
                         it[Person.age] = 12

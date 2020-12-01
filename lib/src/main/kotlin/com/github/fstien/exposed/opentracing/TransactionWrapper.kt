@@ -13,11 +13,11 @@ val NoPII = Contains.NoPII
 val PII = Contains.PII
 
 fun <T> tracedTransaction(
-        vararg replacePII: String = emptyArray(),
         contains: Contains = Contains.PII,
+        vararg replacePII: String = emptyArray(),
         statement: Transaction.() -> T): T {
 
-    if (!validInputs(replacePII.toList(), contains)) {
+    if (!validInputs(contains, replacePII.toList())) {
         log.warn("Invalid inputs to tracedTransaction(), no span created.")
         return transaction { statement() }
     }
