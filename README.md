@@ -1,5 +1,4 @@
-
-![](./img/logo.png )
+<img src="./img/logo.png" alt="Exposed" height="200" />
 
 ![GitHub](https://img.shields.io/github/license/fstien/Exposed-OpenTracing.svg?color=green&style=popout)
 [![Unit Tests Actions Status](https://github.com/fstien/Exposed-OpenTracing/workflows/Unit%20Tests/badge.svg)](https://github.com/{userName}/{repoName}/actions)
@@ -21,7 +20,7 @@ tracedTransaction(contains = NoPII) {
 ```
 The execution will be wrapped with a child [span](https://opentracing.io/docs/overview/spans/) of the previously active span, which will be tagged with the SQL query. If your query contains PII that you do not want to leak to the tracing system, pass the sensitive strings to the call as follows:
 ```kotlin
-tracedTransaction(name, password, contains = PII) {
+tracedTransaction(contains = PII, name, password) {
     Users.insert {
         it[Users.username] = username
         it[Users.name] = name

@@ -5,7 +5,7 @@ import mu.KotlinLogging
 
 private val log = KotlinLogging.logger {}
 
-internal fun validInputs(replacePii: List<String>, contains: Contains): Boolean {
+internal fun validInputs(contains: Contains, replacePii: List<String>): Boolean {
     when (contains) {
         Contains.PII -> {
             if (replacePii.isEmpty()) {
