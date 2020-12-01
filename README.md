@@ -51,4 +51,4 @@ Add the following dependency to your `pom.xml`:
 ### Gradle
 Add the following to your dependencies in your `build.gradle`:
 
-    implementation 'com.github.fstien:kotlin-logging-opentracing-decorator:VERSION_NUMBER'
+    implementation 'com.github.fstien:exposed-opentracing:VERSION_NUMBER'
