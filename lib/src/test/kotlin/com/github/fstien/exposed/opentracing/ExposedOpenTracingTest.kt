@@ -17,6 +17,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -83,10 +84,16 @@ class ExposedOpenTracingTest: DatabaseTestsBase() {
         runBlocking {
             withParentSpan {
                 tracedTransaction(contains = NoPII) {
-                    Person.insert {
-                        it[username] = "Francois"
-                        it[age] = 25
-                        it[password] = "OWIDJFedw"
+                    val person = Person
+                        .select { Person.username eq "Francois" }
+                        .firstOrNull()
+
+                    if (person == null) {
+                        Person.insert {
+                            it[username] = "Francois"
+                            it[age] = 25
+                            it[password] = "OWIDJFedw"
+                        }
                     }
                 }
             }
@@ -99,16 +106,24 @@ class ExposedOpenTracingTest: DatabaseTestsBase() {
             with(first()) {
                 assertThat(this.operationName()).isEqualTo("ExposedTransaction")
 
-                with(logEntries()) {
-                    assertThat(this[0].fields()["event"]).isEqualTo("Starting Execution")
-                    assertThat(this[1].fields()["event"]).isEqualTo("Finished Execution")
+                with(tags()) {
+                    assertThat(this["DbUrl"]).isEqualTo("jdbc:sqlite:file:test?mode=memory&cache=shared")
+                    assertThat(this["DbVendor"]).isEqualTo("sqlite")
+                    assertThat(this["StatementCount"]).isEqualTo(3)
                 }
 
-                with(tags()) {
-                    assertThat(this["Query"]).isEqualTo("INSERT INTO Person (age, \"name\", password) VALUES (25, 'Francois', 'OWIDJFedw')")
-                    assertThat(this["TableNames"]).isEqualTo("[Person]")
-                    assertThat(this["StatementType"]).isEqualTo("INSERT")
-                    assertThat(this["StatementCount"]).isEqualTo(2)
+                with(logEntries()) {
+                    assertThat(this[0].fields()["event"]).isEqualTo("Starting Execution")
+                    assertThat(this[0].fields()["query"]).isEqualTo("SELECT Person.id, Person.\"name\", Person.age, Person.password FROM Person WHERE Person.\"name\" = 'Francois'")
+                    assertThat(this[0].fields()["tables"]).isEqualTo("[Person]")
+
+                    assertThat(this[1].fields()["event"]).isEqualTo("Finished Execution")
+
+                    assertThat(this[2].fields()["event"]).isEqualTo("Starting Execution")
+                    assertThat(this[2].fields()["query"]).isEqualTo("INSERT INTO Person (age, \"name\", password) VALUES (25, 'Francois', 'OWIDJFedw')")
+                    assertThat(this[2].fields()["tables"]).isEqualTo("[Person]")
+
+                    assertThat(this[3].fields()["event"]).isEqualTo("Finished Execution")
                 }
             }
         }
@@ -131,9 +146,8 @@ class ExposedOpenTracingTest: DatabaseTestsBase() {
             }
         }
 
-
         with(mockTracer.finishedSpans().first()) {
-            assertThat(this.tags()["Query"]).isEqualTo("INSERT INTO Person (age, \"name\", password) VALUES (12, '<REDACTED>', '<REDACTED>')")
+            assertThat(this.logEntries().first().fields()["query"]).isEqualTo("INSERT INTO Person (age, \"name\", password) VALUES (12, '<REDACTED>', '<REDACTED>')")
         }
     }
 

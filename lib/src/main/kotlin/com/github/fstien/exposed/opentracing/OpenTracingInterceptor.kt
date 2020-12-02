@@ -11,24 +11,43 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 
 
 internal class OpenTracingInterceptor(private val replacePII: List<String>): StatementInterceptor {
-    override fun beforeExecution(transaction: Transaction, context: StatementContext) = withActiveSpan {
-        log("Starting Execution")
+    companion object {
+        val durations = mutableMapOf<String, Long?>()
+    }
 
+    override fun beforeExecution(transaction: Transaction, context: StatementContext) = withActiveSpan {
         val query = context.expandArgs(TransactionManager.current())
-        setTag("Query", query.sanitize(replacePII))
+
+        log(mapOf(
+            "event" to "Starting Execution",
+            "query" to query.sanitize(replacePII),
+            "tables" to context.statement.targets.map { it.tableName }.toString(),
+        ))
 
         setTag("StatementCount", transaction.statementCount)
-        setTag("TableNames", context.statement.targets.map { it.tableName }.toString())
-        setTag("StatementType", context.statement.type.toString())
+        setTag("DbUrl", transaction.db.url)
+        setTag("DbVendor", transaction.db.vendor)
+        setTag("DbVersion", transaction.db.version)
+
+        durations[transaction.id] = System.currentTimeMillis()
     }
 
     override fun afterExecution(transaction: Transaction, contexts: List<StatementContext>, executedStatement: PreparedStatementApi) = withActiveSpan {
-        log("Finished Execution")
+        var duration = "NA"
+        val startTime = durations[transaction.id]
+        if (startTime != null) {
+            duration = (System.currentTimeMillis() - startTime).toString()
+            durations[transaction.id] = null
+        }
+
+        log(mapOf(
+                "event" to "Finished Execution",
+                "duration" to duration
+        ))
     }
 
     override fun beforeCommit(transaction: Transaction) = withActiveSpan {
         log("Send Commit")
-        setTag("Duration", transaction.duration)
     }
 
     override fun afterCommit() = withActiveSpan {
