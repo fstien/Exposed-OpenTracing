@@ -21,8 +21,15 @@ internal class OpenTracingInterceptor(private val replacePII: List<String>): Sta
     }
 
     override fun beforeExecution(transaction: Transaction, context: StatementContext) {
-        val span = tracer.buildSpan("ExposedQuery").start()
 
+        tracer.activeSpan()?.let { transactionSpan ->
+            transactionSpan.setTag("StatementCount", transaction.statementCount)
+            transactionSpan.setTag("DbUrl", transaction.db.url)
+            transactionSpan.setTag("DbVendor", transaction.db.vendor)
+            transactionSpan.setTag("DbVersion", transaction.db.version)
+        }
+
+        val span = tracer.buildSpan("ExposedQuery").start()
         val scope = tracer.scopeManager().activate(span)
         scopes[transaction.id] = scope
 
@@ -46,11 +53,6 @@ internal class OpenTracingInterceptor(private val replacePII: List<String>): Sta
 
     override fun beforeCommit(transaction: Transaction) = withActiveSpan(tracer) {
         log("Send Commit")
-
-        setTag("StatementCount", transaction.statementCount)
-        setTag("DbUrl", transaction.db.url)
-        setTag("DbVendor", transaction.db.vendor)
-        setTag("DbVersion", transaction.db.version)
     }
 
     override fun afterCommit() = withActiveSpan(tracer) {

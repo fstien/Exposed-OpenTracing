@@ -101,26 +101,21 @@ class ExposedOpenTracingTest: DatabaseTestsBase() {
             with(transactionSpan.tags()) {
                 assertThat(get("DbUrl")).isEqualTo("jdbc:sqlite:file:test?mode=memory&cache=shared")
                 assertThat(get("DbVendor")).isEqualTo("sqlite")
-                assertThat(this["StatementCount"]).isEqualTo(2)
+                assertThat(this["StatementCount"]).isEqualTo(3)
             }
 
-            with(this[1]) {
-                /*
-                assertThat(this[0].fields()["event"]).isEqualTo("Starting Execution")
-                assertThat(this[0].fields()["query"]).isEqualTo("SELECT Person.id, Person.\"name\", Person.age, Person.password FROM Person WHERE Person.\"name\" = 'Francois'")
-                assertThat(this[0].fields()["tables"]).isEqualTo("[Person]")
+            val query1Span = firstOrNull { it.operationName() == "ExposedQuery" }!!
+            val query2Span = lastOrNull { it.operationName() == "ExposedQuery" }!!
 
-                assertThat(this[1].fields()["event"]).isEqualTo("Finished Execution")
-
-                assertThat(this[2].fields()["event"]).isEqualTo("Starting Execution")
-                assertThat(this[2].fields()["query"]).isEqualTo("INSERT INTO Person (age, \"name\", password) VALUES (25, 'Francois', 'OWIDJFedw')")
-                assertThat(this[2].fields()["tables"]).isEqualTo("[Person]")
-
-                assertThat(this[3].fields()["event"]).isEqualTo("Finished Execution")
-
-                 */
+            with(query1Span.tags()) {
+                assertThat(this["query"]).isEqualTo("SELECT Person.id, Person.\"name\", Person.age, Person.password FROM Person WHERE Person.\"name\" = 'Francois'")
+                assertThat(this["table"]).isEqualTo("[Person]")
             }
 
+            with(query2Span.tags()) {
+                assertThat(this["query"]).isEqualTo("INSERT INTO Person (age, \"name\", password) VALUES (25, 'Francois', 'OWIDJFedw')")
+                assertThat(this["table"]).isEqualTo("[Person]")
+            }
         }
     }
 
