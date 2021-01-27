@@ -34,7 +34,7 @@ If no strings are password with `contains = PII` or if a string is passed with `
 
 The resulting `ExposedTransaction` span looks as follows in [Jaeger](https://www.jaegertracing.io/):
 
-![](./img/jaeger.png)
+![](./img/jaeger2.png)
 
 ## Installation
 
