@@ -48,23 +48,19 @@ test {
     useJUnitPlatform()
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allSource
+tasks.whenTaskAdded {
+    if (name == ":lib:generateSourcesJarForMavenPublication") {
+        this as Jar
+        from(sourceSets.main.get().allSource)
+    }
 }
-
-artifacts {
-    archives sourcesJar
-}
-
-bintrayUpload.dependsOn assemble
 
 publish {
     userOrg = 'fstien'
     repoName = 'exposed-opentracing'
     groupId = 'com.github.fstien'
     artifactId = 'exposed-opentracing'
-    publishVersion = '0.2.0'
+    publishVersion = '0.2.1'
     desc = 'OpenTracing instrumentation of Exposed.'
     website = 'https://github.com/fstien/Exposed-OpenTracing'
 }
