@@ -48,6 +48,13 @@ test {
     useJUnitPlatform()
 }
 
+tasks.whenTaskAdded {
+    if (name == "generateSourcesJarForMavenPublication") {
+        this as Jar
+        from(sourceSets.main.get().allSource)
+    }
+}
+
 publish {
     userOrg = 'fstien'
     repoName = 'exposed-opentracing'
