@@ -1,6 +1,6 @@
 <img src="./img/logo.png" alt="Exposed" height="200" />
 
- [![Download](https://api.bintray.com/packages/fstien/exposed-opentracing/exposed-opentracing/images/download.svg)](https://bintray.com/fstien/exposed-opentracing/exposed-opentracing/_latestVersion)
+![Maven Central](https://img.shields.io/maven-central/v/com.github.fstien/exposed-opentracing?color=green)
 ![GitHub](https://img.shields.io/github/license/fstien/Exposed-OpenTracing.svg?color=green&style=popout)
 [![Unit Tests Actions Status](https://github.com/fstien/Exposed-OpenTracing/workflows/Unit%20Tests/badge.svg)](https://github.com/{userName}/{repoName}/actions)
 
@@ -38,7 +38,7 @@ The resulting `ExposedTransaction` span looks as follows in [Jaeger](https://www
 
 ## Installation
 
-Available for download from [jcenter](https://bintray.com/fstien/exposed-opentracing/exposed-opentracing).
+From [Maven Central](https://search.maven.org/artifact/com.github.fstien/exposed-opentracing).
 ### Maven
 Add the following dependency to your `pom.xml`:
     
