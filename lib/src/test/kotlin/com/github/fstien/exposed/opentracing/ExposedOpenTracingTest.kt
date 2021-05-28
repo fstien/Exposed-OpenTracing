@@ -108,19 +108,35 @@ class ExposedOpenTracingTest: DatabaseTestsBase() {
             val query2Span = lastOrNull { it.operationName() == "ExposedQuery" }!!
 
             with(query1Span.tags()) {
-                assertThat(this["query"]).isEqualTo("SELECT Person.id, Person.\"name\", Person.age, Person.password FROM Person WHERE Person.\"name\" = 'Francois'")
+                assertThat(this["query"]).isEqualTo(
+                    """SELECT
+                      |        Person.id,
+                      |        Person."name",
+                      |        Person.age,
+                      |        Person.password 
+                      |    FROM
+                      |        Person 
+                      |    WHERE
+                      |        Person."name" = 'Francois'""".trimMargin())
+
                 assertThat(this["table"]).isEqualTo("[Person]")
             }
 
             with(query2Span.tags()) {
-                assertThat(this["query"]).isEqualTo("INSERT INTO Person (age, \"name\", password) VALUES (25, 'Francois', 'OWIDJFedw')")
+                assertThat(this["query"]).isEqualTo(
+                     """INSERT 
+                        |    INTO
+                        |        Person
+                        |        (age, "name", password) 
+                        |    VALUES
+                        |        (25, 'Francois', 'OWIDJFedw')""".trimMargin())
                 assertThat(this["table"]).isEqualTo("[Person]")
             }
         }
     }
 
     @Test
-    fun `tracedTransaction with PII santitises query string`() = withTables(Person) {
+    fun `tracedTransaction with PII sanitised query string`() = withTables(Person) {
         val username = "el_franfran"
         val password = "oquejJNLKJQnW"
 
@@ -135,7 +151,13 @@ class ExposedOpenTracingTest: DatabaseTestsBase() {
         }
 
         with(mockTracer.finishedSpans().first()) {
-            assertThat(this.tags()["query"]).isEqualTo("INSERT INTO Person (age, \"name\", password) VALUES (12, '<REDACTED>', '<REDACTED>')")
+            assertThat(this.tags()["query"]).isEqualTo(
+                """INSERT 
+                  |    INTO
+                  |        Person
+                  |        (age, "name", password) 
+                  |    VALUES
+                  |        (12, '<REDACTED>', '<REDACTED>')""".trimMargin())
         }
     }
 

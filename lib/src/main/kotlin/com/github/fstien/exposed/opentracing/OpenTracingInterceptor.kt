@@ -34,7 +34,10 @@ internal class OpenTracingInterceptor(private val replacePII: List<String>): Sta
         scopes[transaction.id] = scope
 
         val query = context.expandArgs(TransactionManager.current())
-        span.setTag("query", query.sanitize(replacePII))
+            .sanitize(replacePII)
+            .format()
+
+        span.setTag("query", query)
         span.setTag("table", context.statement.targets.map { it.tableName }.toString())
     }
 
@@ -72,14 +75,3 @@ internal inline fun withActiveSpan(tracer: Tracer, block: Span.() -> Unit) {
     val activeSpan: Span = tracer.activeSpan() ?: return
     block(activeSpan)
 }
-
-internal fun String.sanitize(replace: List<String>): String {
-    var returnString = this
-
-    for (str in replace) {
-        returnString = returnString.replace(oldValue = str, newValue = "<REDACTED>")
-    }
-
-    return returnString
-}
-
