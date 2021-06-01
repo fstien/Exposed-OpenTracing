@@ -45,7 +45,7 @@ test {
 
 ext {
     PUBLISH_GROUP_ID = 'com.github.fstien'
-    PUBLISH_VERSION = '0.2.2'
+    PUBLISH_VERSION = '0.2.3'
     PUBLISH_ARTIFACT_ID = 'exposed-opentracing'
 }
 
