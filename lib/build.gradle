@@ -10,7 +10,6 @@ plugins {
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
@@ -26,11 +25,10 @@ dependencies {
     implementation "io.opentracing:opentracing-noop:$opentracing_version"
     implementation "io.opentracing:opentracing-util:$opentracing_version"
 
-    implementation "com.zopa:ktor-opentracing:0.3.3"
-
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'io.github.microutils:kotlin-logging-jvm:2.0.2'
 
+    testImplementation "com.zopa:ktor-opentracing:0.3.3"
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.4.2"
@@ -45,7 +43,7 @@ test {
 
 ext {
     PUBLISH_GROUP_ID = 'com.github.fstien'
-    PUBLISH_VERSION = '0.2.3'
+    PUBLISH_VERSION = '0.2.4'
     PUBLISH_ARTIFACT_ID = 'exposed-opentracing'
 }
 
